@@ -274,9 +274,13 @@ app.get("/api/place/:id", async (req, res) => {
 app.post("/api/bookings", (req, res) => {
   mongoose.connect(process.env.MONGO_URL)
   const { access_token } = req.cookies
+  if (!access_token)
+    return res.status(400).json({ message: "Please login in." })
   const { place, checkIn, checkOut, numberOfGuests, name, mobile, price } =
     req.body
   jwt.verify(access_token, jwtSecret, {}, async (err, userDataInToken) => {
+    if (err) throw err
+
     const bookingDoc = await Booking.create({
       owner: userDataInToken.id,
       place,
@@ -287,7 +291,6 @@ app.post("/api/bookings", (req, res) => {
       mobile,
       price,
     })
-    if (err) throw err
     res.json(bookingDoc)
   })
 })

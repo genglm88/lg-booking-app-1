@@ -2,7 +2,7 @@ import React, { useState } from "react"
 import { differenceInCalendarDays } from "date-fns"
 import axios from "axios"
 
-const BookingPanel = ({place, setRedirect}) => {
+const BookingPanel = ({ place, setRedirect }) => {
   const [booking, setBooking] = useState({
     checkIn: "",
     checkOut: "",
@@ -10,6 +10,7 @@ const BookingPanel = ({place, setRedirect}) => {
     name: "",
     mobile: "",
   })
+  const [bookingError, setBookingError] = useState(false)
 
   const { checkIn, checkOut, numberOfGuests, name, mobile } = booking
 
@@ -36,7 +37,9 @@ const BookingPanel = ({place, setRedirect}) => {
       const bookingId = data._id
       setRedirect(`/account/bookings/${bookingId}`)
     } catch (err) {
-      console.log(err)
+      setBookingError(true)
+      alert("Please login in first.")
+      setRedirect('/login')
     }
   }
   return (
@@ -117,7 +120,11 @@ const BookingPanel = ({place, setRedirect}) => {
       <button className="primary" onClick={handleBooking}>
         Book this place
       </button>
-      {numberOfNights > 0 && <p>${numberOfNights * place.price}</p>}
+      {bookingError ? (
+        <p className="text-red-600">Please login in first.</p>
+      ) : (
+        numberOfNights > 0 && <p>${numberOfNights * place.price}</p>
+      )}
     </div>
   )
 }
